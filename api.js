@@ -22,6 +22,7 @@ const getAllProducts = async () => {
   } catch (e) {
     return handleError();
   }
+  return response;
 };
 
 const createProduct = async (event) => {
@@ -42,6 +43,7 @@ const createProduct = async (event) => {
   } catch (e) {
     return handleError();
   }
+  return response;
 };
 
 const getProduct = async (event) => {
@@ -60,6 +62,7 @@ const getProduct = async (event) => {
   } catch (e) {
     return handleError();
   }
+  return response;
 };
 
 const updateProduct = async (event) => {
@@ -100,6 +103,7 @@ const updateProduct = async (event) => {
   } catch (e) {
     return handleError();
   }
+  return response;
 };
 
 const deleteProduct = async (event) => {
@@ -119,6 +123,7 @@ const deleteProduct = async (event) => {
   } catch (e) {
     return handleError();
   }
+  return response;
 };
 
 const handleError = (e) => {
