@@ -20,7 +20,7 @@ const getAllProducts = async () => {
       data: Items.map((item) => unmarshall(item)),
     });
   } catch (e) {
-    return handleError();
+    return handleError(e);
   }
   return response;
 };
@@ -41,7 +41,7 @@ const createProduct = async (event) => {
       result,
     });
   } catch (e) {
-    return handleError();
+    return handleError(e);
   }
   return response;
 };
@@ -60,7 +60,7 @@ const getProduct = async (event) => {
       data: Item ? unmarshall(Item) : {},
     });
   } catch (e) {
-    return handleError();
+    return handleError(e);
   }
   return response;
 };
@@ -101,7 +101,7 @@ const updateProduct = async (event) => {
       updateResult,
     });
   } catch (e) {
-    return handleError();
+    return handleError(e);
   }
   return response;
 };
@@ -121,7 +121,7 @@ const deleteProduct = async (event) => {
       deleteResult,
     });
   } catch (e) {
-    return handleError();
+    return handleError(e);
   }
   return response;
 };
