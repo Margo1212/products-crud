@@ -10,7 +10,7 @@ import { dbClient } from "./databaseSetup.js";
 import uuid4 from "uuid4";
 import Joi from "joi";
 
-let validationSchema = Joi.object().keys({
+const validationSchema = Joi.object().keys({
   name: Joi.string().required(),
   model: Joi.string().required(),
   price: Joi.number().required(),
