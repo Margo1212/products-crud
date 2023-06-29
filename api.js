@@ -2,6 +2,8 @@ import {
   ScanCommand,
   PutItemCommand,
   GetItemCommand,
+  UpdateItemCommand,
+  DeleteItemCommand,
 } from "@aws-sdk/client-dynamodb";
 import { unmarshall, marshall } from "@aws-sdk/util-dynamodb";
 import { dbClient } from "./databaseSetup.js";
@@ -81,4 +83,85 @@ const getProduct = async (event) => {
   return response;
 };
 
-export { getAllProducts, createProduct, getProduct };
+const updateProduct = async (event) => {
+  const response = { statusCode: 200 };
+
+  try {
+    const body = JSON.parse(event.body);
+    const objKeys = Object.keys(body);
+    const params = {
+      TableName: process.env.DYNAMODB_TABLE_NAME,
+      Key: marshall({ id: event.pathParameters.id }),
+      UpdateExpression: `SET ${objKeys
+        .map((_, index) => `#key${index} = :value${index}`)
+        .join(", ")}`,
+      ExpressionAttributeNames: objKeys.reduce(
+        (acc, key, index) => ({
+          ...acc,
+          [`#key${index}`]: key,
+        }),
+        {}
+      ),
+      ExpressionAttributeValues: marshall(
+        objKeys.reduce(
+          (acc, key, index) => ({
+            ...acc,
+            [`:value${index}`]: body[key],
+          }),
+          {}
+        )
+      ),
+    };
+    const updateResult = await dbClient.send(new UpdateItemCommand(params));
+
+    response.body = JSON.stringify({
+      message: "Success;)",
+      updateResult,
+    });
+  } catch (e) {
+    console.error(e);
+    response.statusCode = 500;
+    response.body = JSON.stringify({
+      message: "Failed;(",
+      errorMsg: e.message,
+      errorStack: e.stack,
+    });
+  }
+
+  return response;
+};
+
+const deleteProduct = async (event) => {
+  const response = { statusCode: 200 };
+
+  try {
+    const params = {
+      TableName: process.env.DYNAMODB_TABLE_NAME,
+      Key: marshall({ postId: event.pathParameters.postId }),
+    };
+    const deleteResult = await dbClient.send(new DeleteItemCommand(params));
+
+    response.body = JSON.stringify({
+      message: "Success;)",
+      deleteResult,
+    });
+  } catch (e) {
+    console.error(e);
+    response.statusCode = 500;
+    response.body = JSON.stringify({
+      message: "Failed;(",
+      errorMsg: e.message,
+      errorStack: e.stack,
+    });
+  }
+
+  return response;
+};
+
+export {
+  getAllProducts,
+  createProduct,
+  getProduct,
+  updateProduct,
+  deleteProduct,
+};
