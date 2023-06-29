@@ -13,7 +13,6 @@ const getAllProducts = async () => {
     response.body = JSON.stringify({
       message: "Success!!;)",
       data: Items.map((item) => unmarshall(item)),
-      Items,
     });
   } catch (e) {
     console.error(e);
