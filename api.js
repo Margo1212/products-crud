@@ -8,6 +8,13 @@ import {
 import { unmarshall, marshall } from "@aws-sdk/util-dynamodb";
 import { dbClient } from "./databaseSetup.js";
 import uuid4 from "uuid4";
+import Joi from "joi";
+
+let validationSchema = Joi.object().keys({
+  name: Joi.string().required(),
+  model: Joi.string().required(),
+  price: Joi.number().required(),
+});
 
 const getAllProducts = async () => {
   const response = { statusCode: 200 };
@@ -37,6 +44,13 @@ const createProduct = async (event) => {
     const productRequest = JSON.parse(event.body);
     const productId = uuid4();
     productRequest.id = productId;
+    const validation = Joi.validate(productRequest, schema);
+    if (validation.error) {
+      return (response = {
+        statusCode: 500,
+        body: JSON.stringify(validation.error.details),
+      });
+    }
     const params = {
       TableName: process.env.DYNAMODB_TABLE_NAME,
       Item: marshall(productRequest || {}),
