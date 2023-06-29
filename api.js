@@ -37,16 +37,6 @@ const createProduct = async (event) => {
     const productRequest = JSON.parse(event.body);
     const productId = uuid4();
     productRequest.id = productId;
-    if (
-      (productRequest.name ?? typeof productRequest.name !== "string") ||
-      (productRequest.price ?? typeof productRequest.price !== "number") ||
-      (productRequest.model ?? typeof productRequest.model !== "string")
-    ) {
-      return (response = {
-        statusCode: 500,
-        body: "name must be a string!",
-      });
-    }
     const params = {
       TableName: process.env.DYNAMODB_TABLE_NAME,
       Item: marshall(productRequest || {}),
