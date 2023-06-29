@@ -1,0 +1,103 @@
+service: api-crud-products
+
+provider:
+  name: aws
+  runtime: nodejs14.x
+  stage: prod
+  region: eu-north-1
+  environment:
+    DYNAMODB_TABLE_NAME: ${self:custom.productsTableName}
+
+custom:
+  productsTableName: products-table-${self:provider.stage}
+
+plugins:
+  - serverless-iam-roles-per-function
+
+functions:
+  getProduct:
+    handler: api.getProduct
+    name: get-product
+    memorySize: 128
+    timeout: 5
+    events:
+      - http:
+          path: products/{id}
+          method: GET
+    iamRoleStatements:
+      - Effect: "Allow"
+        Action:
+          - "dynamodb:GetItem"
+        Resource: !GetAtt ProductsTable.Arn
+  createProduct:
+    handler: api.createProduct
+    name: create-product
+    memorySize: 128
+    timeout: 5
+    events:
+      - http:
+          path: products
+          method: POST
+    iamRoleStatements:
+      - Effect: "Allow"
+        Action:
+          - "dynamodb:PutItem"
+        Resource: !GetAtt ProductsTable.Arn
+  updateProduct:
+    handler: api.updateProduct
+    name: update-product
+    memorySize: 128
+    timeout: 5
+    events:
+      - http:
+          path: products/{id}
+          method: PUT
+    iamRoleStatements:
+      - Effect: "Allow"
+        Action:
+          - "dynamodb:UpdateItem"
+        Resource: !GetAtt ProductsTable.Arn
+  deleteProduct:
+    handler: api.deleteProduct
+    name: delete-product
+    memorySize: 128
+    timeout: 5
+    events:
+      - http:
+          path: products/{id}
+          method: DELETE
+    iamRoleStatements:
+      - Effect: "Allow"
+        Action:
+          - "dynamodb:DeleteItem"
+        Resource: !GetAtt ProductsTable.Arn
+  getAllProducts:
+    handler: api.getAllProducts
+    name: get-all-products
+    memorySize: 128
+    timeout: 5
+    events:
+      - http:
+          path: products
+          method: GET
+    iamRoleStatements:
+      - Effect: "Allow"
+        Action:
+          - "dynamodb:Scan"
+        Resource: !GetAtt ProductsTable.Arn
+
+resources:
+  Resources:
+    ProductsTable:
+      Type: AWS::DynamoDB::Table
+      Properties:
+        TableName: ${self:custom.productsTableName}
+        AttributeDefinitions:
+          - AttributeName: id
+            AttributeType: S
+        KeySchema:
+          - AttributeName: id
+            KeyType: HASH
+        ProvisionedThroughput:
+          ReadCapacityUnits: 1
+          WriteCapacityUnits: 1
