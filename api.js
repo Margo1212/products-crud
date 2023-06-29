@@ -20,15 +20,8 @@ const getAllProducts = async () => {
       data: Items.map((item) => unmarshall(item)),
     });
   } catch (e) {
-    console.error(e);
-    response.statusCode = 500;
-    response.body = JSON.stringify({
-      message: "Failed;(",
-      errorMsg: e.message,
-      errorStack: e.stack,
-    });
+    return handleError();
   }
-  return response;
 };
 
 const createProduct = async (event) => {
@@ -47,15 +40,8 @@ const createProduct = async (event) => {
       result,
     });
   } catch (e) {
-    console.error(e);
-    response.statusCode = 500;
-    response.body = JSON.stringify({
-      message: "Failed;(",
-      errorMsg: e.message,
-      errorStack: e.stack,
-    });
+    return handleError();
   }
-  return response;
 };
 
 const getProduct = async (event) => {
@@ -72,15 +58,8 @@ const getProduct = async (event) => {
       data: Item ? unmarshall(Item) : {},
     });
   } catch (e) {
-    console.error(e);
-    response.statusCode = 500;
-    response.body = JSON.stringify({
-      message: "Failed;(",
-      errorMsg: e.message,
-      errorStack: e.stack,
-    });
+    return handleError();
   }
-  return response;
 };
 
 const updateProduct = async (event) => {
@@ -119,16 +98,8 @@ const updateProduct = async (event) => {
       updateResult,
     });
   } catch (e) {
-    console.error(e);
-    response.statusCode = 500;
-    response.body = JSON.stringify({
-      message: "Failed;(",
-      errorMsg: e.message,
-      errorStack: e.stack,
-    });
+    return handleError();
   }
-
-  return response;
 };
 
 const deleteProduct = async (event) => {
@@ -146,16 +117,22 @@ const deleteProduct = async (event) => {
       deleteResult,
     });
   } catch (e) {
-    console.error(e);
-    response.statusCode = 500;
-    response.body = JSON.stringify({
-      message: "Failed;(",
-      errorMsg: e.message,
-      errorStack: e.stack,
-    });
+    return handleError();
   }
+};
 
-  return response;
+const handleError = (e) => {
+  if (e) {
+    return {
+      statusCode: e.statusCode,
+      body: JSON.stringify({
+        message: "Failed;(",
+        errorMsg: e.message,
+        errorStack: e.stack,
+      }),
+    };
+  }
+  throw e;
 };
 
 export {
