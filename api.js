@@ -8,6 +8,13 @@ import {
 import { unmarshall, marshall } from "@aws-sdk/util-dynamodb";
 import { dbClient } from "./databaseSetup.js";
 import uuid4 from "uuid4";
+import * as yup from "yup";
+
+const schema = yup.object().shape({
+  name: yup.string().required(),
+  model: yup.string().required(),
+  price: yup.number().required(),
+});
 
 const getAllProducts = async () => {
   const response = { statusCode: 200 };
@@ -31,6 +38,7 @@ const createProduct = async (event) => {
     const productRequest = JSON.parse(event.body);
     const productId = uuid4();
     productRequest.id = productId;
+    await schema.validate(productRequest);
     const params = {
       TableName: process.env.DYNAMODB_TABLE_NAME,
       Item: marshall(productRequest || {}),
@@ -70,6 +78,7 @@ const updateProduct = async (event) => {
 
   try {
     const body = JSON.parse(event.body);
+    await schema.validate(body);
     const objKeys = Object.keys(body);
     const params = {
       TableName: process.env.DYNAMODB_TABLE_NAME,
@@ -127,6 +136,15 @@ const deleteProduct = async (event) => {
 };
 
 const handleError = (e) => {
+  if (e instanceof yup.ValidationError) {
+    return {
+      statusCode: 400,
+      body: JSON.stringify({
+        message: "Failed;(",
+        errors: e.errors,
+      }),
+    };
+  }
   if (e) {
     return {
       statusCode: e.statusCode,
