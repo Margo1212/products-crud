@@ -44,7 +44,7 @@ const createProduct = async (event) => {
     const productRequest = JSON.parse(event.body);
     const productId = uuid4();
     productRequest.id = productId;
-    const validation = validationSchema.validate(productRequest);
+    let validation = validationSchema.validate(productRequest);
     if (validation.error) {
       return (response = {
         statusCode: 500,
