@@ -1,6 +1,7 @@
 import { ScanCommand, PutItemCommand } from "@aws-sdk/client-dynamodb";
 import { unmarshall, marshall } from "@aws-sdk/util-dynamodb";
 import { dbClient } from "./databaseSetup.js";
+import uuid4 from "uuid4";
 
 const getAllProducts = async () => {
   const response = { statusCode: 200 };
@@ -26,15 +27,15 @@ const getAllProducts = async () => {
 
 const createProduct = async (event) => {
   const response = { statusCode: 200 };
-
   try {
-    const body = JSON.parse(event.body);
+    const productRequest = JSON.parse(event.body);
+    const productId = uuid4();
+    productRequest.id = productId;
     const params = {
       TableName: process.env.DYNAMODB_TABLE_NAME,
-      Item: marshall(body || {}),
+      Item: marshall(productRequest || {}),
     };
     const result = await dbClient.send(new PutItemCommand(params));
-
     response.body = JSON.stringify({
       message: "Success;)",
       result,
