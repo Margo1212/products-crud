@@ -46,10 +46,10 @@ const createProduct = async (event) => {
     productRequest.id = productId;
     let validation = validationSchema.validate(productRequest);
     if (validation.error) {
-      return (response = {
+      response = {
         statusCode: 500,
         body: JSON.stringify(validation.error.details),
-      });
+      };
     }
     const params = {
       TableName: process.env.DYNAMODB_TABLE_NAME,
