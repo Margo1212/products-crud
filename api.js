@@ -14,7 +14,7 @@ const schema = yup.object().shape({
   name: yup.string().required(),
   model: yup.string().required(),
   price: yup.number().required(),
-});
+}, { strict: true },);
 
 const getAllProducts = async () => {
   const response = { statusCode: 200 };
