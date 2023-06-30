@@ -16,7 +16,7 @@ plugins:
 
 functions:
   getProduct:
-    handler: api.getProduct
+    handler: src/api.getProduct
     name: get-product
     memorySize: 128
     timeout: 5
@@ -30,7 +30,7 @@ functions:
           - "dynamodb:GetItem"
         Resource: !GetAtt ProductsTable.Arn
   createProduct:
-    handler: api.createProduct
+    handler: src/api.createProduct
     name: create-product
     memorySize: 128
     timeout: 5
@@ -44,7 +44,7 @@ functions:
           - "dynamodb:PutItem"
         Resource: !GetAtt ProductsTable.Arn
   updateProduct:
-    handler: api.updateProduct
+    handler: src/api.updateProduct
     name: update-product
     memorySize: 128
     timeout: 5
@@ -58,7 +58,7 @@ functions:
           - "dynamodb:UpdateItem"
         Resource: !GetAtt ProductsTable.Arn
   deleteProduct:
-    handler: api.deleteProduct
+    handler: src/api.deleteProduct
     name: delete-product
     memorySize: 128
     timeout: 5
@@ -72,7 +72,7 @@ functions:
           - "dynamodb:DeleteItem"
         Resource: !GetAtt ProductsTable.Arn
   getAllProducts:
-    handler: api.getAllProducts
+    handler: src/api.getAllProducts
     name: get-all-products
     memorySize: 128
     timeout: 5
