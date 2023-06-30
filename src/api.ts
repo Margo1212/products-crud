@@ -63,7 +63,9 @@ const getProduct = async (
       Key: marshall({ id: id }),
     };
     const { Item } = await dbClient.send(new GetItemCommand(params));
-    console.log({ Item });
+    if (!Item) {
+      return handleError("Product doesnt exist!");
+    }
     response.body = JSON.stringify({
       message: "Success;)",
       data: Item ? unmarshall(Item) : {},
