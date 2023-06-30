@@ -1,6 +1,6 @@
 # Nodejs Project
 
-## https://t2ic0mzgj9.execute-api.eu-north-1.amazonaws.com/prod/products/
+### https://t2ic0mzgj9.execute-api.eu-north-1.amazonaws.com/prod/products/
 
 # Pre-requisites
 
@@ -28,21 +28,6 @@ Add Typescript to project `npm`.
 ```
 npm install -D typescript
 ```
-
-## Project Structure
-
-The folder structure of this app is explained below:
-
-| Name | Description |
-| ---- | ----------- |
-
-|  
-| **node_modules** | Contains all npm dependencies |
-| **src** | Contains source code that will be compiled to the dist dir |
-|
-| \*\*src/api | Handlers define functions to serve various routes.
-| |
-| package.json | Contains npm dependencies
 
 ### Configuring TypeScript compilation
 
