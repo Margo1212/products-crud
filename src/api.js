@@ -10,6 +10,12 @@ import { dbClient } from "../databaseSetup.js";
 import uuid4 from "uuid4";
 import * as yup from "yup";
 
+yup.addMethod(yup.array, "unique", function (message, mapper = (a) => a) {
+  return this.test("unique", message, function (list) {
+    return list.length === new Set(list.map(mapper)).size;
+  });
+});
+
 const schema = yup.object().shape({
   name: yup.string().required().strict(),
   model: yup.string().required().strict(),
@@ -121,7 +127,7 @@ const deleteProduct = async (event) => {
   try {
     const params = {
       TableName: process.env.DYNAMODB_TABLE_NAME,
-      Key: marshall({ postId: event.pathParameters.postId }),
+      Key: marshall({ id: event.pathParameters.id }),
     };
     const deleteResult = await dbClient.send(new DeleteItemCommand(params));
 
