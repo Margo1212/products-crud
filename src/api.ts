@@ -4,20 +4,13 @@ import {
   GetItemCommand,
   UpdateItemCommand,
   DeleteItemCommand,
-  QueryInput,
 } from "@aws-sdk/client-dynamodb";
 import { unmarshall, marshall } from "@aws-sdk/util-dynamodb";
 import { dbClient } from "../databaseSetup";
 import uuid4 from "uuid4";
-import * as yup from "yup";
+import { schema } from "./validation";
 import { APIGatewayProxyEvent, APIGatewayProxyResult } from "aws-lambda";
-import httpErrors from "http-errors";
-
-const schema = yup.object().shape({
-  name: yup.string().required().strict(),
-  model: yup.string().required().strict(),
-  price: yup.number().positive().integer().required().strict(),
-});
+import { handleError } from "./errorHandler";
 
 const getAllProducts = async () => {
   const response = { statusCode: 200, body: "" };
@@ -42,7 +35,6 @@ const createProduct = async (
   try {
     const productRequest = JSON.parse(event.body as string);
     const productId = uuid4();
-    // const body: string| undefined = ''
     productRequest.id = productId;
     await schema.validate(productRequest);
     const params: any = {
@@ -148,29 +140,6 @@ const deleteProduct = async (
     return handleError(e);
   }
   return response;
-};
-
-const handleError = (e: unknown) => {
-  if (e instanceof yup.ValidationError) {
-    return {
-      statusCode: 400,
-      body: JSON.stringify({
-        message: "Failed;(",
-        errors: e.errors,
-      }),
-    };
-  }
-  if (e instanceof httpErrors.HttpError) {
-    return {
-      statusCode: e.statusCode,
-      body: JSON.stringify({
-        message: "Failed;(",
-        errorMsg: e.message,
-        errorStack: e.stack,
-      }),
-    };
-  }
-  throw e;
 };
 
 export {
