@@ -64,7 +64,7 @@ const getProduct = async (
     };
     const { Item } = await dbClient.send(new GetItemCommand(params));
     if (!Item) {
-      return handleError("Product doesnt exist!");
+      throw Error("Product doesn't exist");
     }
     response.body = JSON.stringify({
       message: "Success;)",
