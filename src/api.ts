@@ -4,17 +4,14 @@ import {
   GetItemCommand,
   UpdateItemCommand,
   DeleteItemCommand,
+  QueryInput,
 } from "@aws-sdk/client-dynamodb";
 import { unmarshall, marshall } from "@aws-sdk/util-dynamodb";
 import { dbClient } from "../databaseSetup.js";
 import uuid4 from "uuid4";
 import * as yup from "yup";
-
-yup.addMethod(yup.array, "unique", function (message, mapper = (a) => a) {
-  return this.test("unique", message, function (list) {
-    return list.length === new Set(list.map(mapper)).size;
-  });
-});
+import { APIGatewayProxyEvent, APIGatewayProxyResult } from "aws-lambda";
+import httpErrors from "http-errors";
 
 const schema = yup.object().shape({
   name: yup.string().required().strict(),
@@ -23,14 +20,14 @@ const schema = yup.object().shape({
 });
 
 const getAllProducts = async () => {
-  const response = { statusCode: 200 };
+  const response = { statusCode: 200, body: "" };
   try {
     const { Items } = await dbClient.send(
       new ScanCommand({ TableName: process.env.DYNAMODB_TABLE_NAME })
     );
     response.body = JSON.stringify({
       message: "Success!!;)",
-      data: Items.map((item) => unmarshall(item)),
+      data: Items!.map((item) => unmarshall(item)),
     });
   } catch (e) {
     return handleError(e);
@@ -38,14 +35,17 @@ const getAllProducts = async () => {
   return response;
 };
 
-const createProduct = async (event) => {
-  const response = { statusCode: 200 };
+const createProduct = async (
+  event: APIGatewayProxyEvent
+): Promise<APIGatewayProxyResult> => {
+  const response = { statusCode: 200, body: "" };
   try {
-    const productRequest = JSON.parse(event.body);
+    const productRequest = JSON.parse(event.body as string);
     const productId = uuid4();
+    // const body: string| undefined = ''
     productRequest.id = productId;
     await schema.validate(productRequest);
-    const params = {
+    const params: any = {
       TableName: process.env.DYNAMODB_TABLE_NAME,
       Item: marshall(productRequest || {}),
     };
@@ -60,12 +60,15 @@ const createProduct = async (event) => {
   return response;
 };
 
-const getProduct = async (event) => {
-  const response = { statusCode: 200 };
+const getProduct = async (
+  event: APIGatewayProxyEvent
+): Promise<APIGatewayProxyResult> => {
+  const response = { statusCode: 200, body: "" };
   try {
+    const id = event.pathParameters?.id as string;
     const params = {
       TableName: process.env.DYNAMODB_TABLE_NAME,
-      Key: marshall({ id: event.pathParameters.id }),
+      Key: marshall({ id: id }),
     };
     const { Item } = await dbClient.send(new GetItemCommand(params));
     console.log({ Item });
@@ -79,16 +82,19 @@ const getProduct = async (event) => {
   return response;
 };
 
-const updateProduct = async (event) => {
-  const response = { statusCode: 200 };
+const updateProduct = async (
+  event: APIGatewayProxyEvent
+): Promise<APIGatewayProxyResult> => {
+  const response = { statusCode: 200, body: "" };
 
   try {
-    const body = JSON.parse(event.body);
+    const body = JSON.parse(event.body as string);
     await schema.validate(body);
     const objKeys = Object.keys(body);
+    const id = event.pathParameters?.id as string;
     const params = {
       TableName: process.env.DYNAMODB_TABLE_NAME,
-      Key: marshall({ id: event.pathParameters.id }),
+      Key: marshall({ id: id }),
       UpdateExpression: `SET ${objKeys
         .map((_, index) => `#key${index} = :value${index}`)
         .join(", ")}`,
@@ -121,13 +127,16 @@ const updateProduct = async (event) => {
   return response;
 };
 
-const deleteProduct = async (event) => {
-  const response = { statusCode: 200 };
+const deleteProduct = async (
+  event: APIGatewayProxyEvent
+): Promise<APIGatewayProxyResult> => {
+  const response = { statusCode: 200, body: "" };
 
   try {
+    const id = event.pathParameters?.id as string;
     const params = {
       TableName: process.env.DYNAMODB_TABLE_NAME,
-      Key: marshall({ id: event.pathParameters.id }),
+      Key: marshall({ id: id }),
     };
     const deleteResult = await dbClient.send(new DeleteItemCommand(params));
 
@@ -141,7 +150,7 @@ const deleteProduct = async (event) => {
   return response;
 };
 
-const handleError = (e) => {
+const handleError = (e: unknown) => {
   if (e instanceof yup.ValidationError) {
     return {
       statusCode: 400,
@@ -151,7 +160,7 @@ const handleError = (e) => {
       }),
     };
   }
-  if (e) {
+  if (e instanceof httpErrors.HttpError) {
     return {
       statusCode: e.statusCode,
       body: JSON.stringify({
