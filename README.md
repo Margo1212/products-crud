@@ -59,3 +59,12 @@ npm install -D typescript
 - PUT /products/{id} - updates a product by UUID
 - DELETE /products/{id} - deletes a product by UUID
 - GET /products - gets a list of products
+
+## Technologies used
+
+- AWS Lambda
+- AWS API Gateway
+- DynamoDB
+- Node.js
+- Typescript
+- Serverless Framework
