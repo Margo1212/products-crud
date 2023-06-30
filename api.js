@@ -11,10 +11,10 @@ import uuid4 from "uuid4";
 import * as yup from "yup";
 
 const schema = yup.object().shape({
-  name: yup.string().required(),
-  model: yup.string().required(),
-  price: yup.number().required(),
-}, { strict: true },);
+  name: yup.string().required().strict(),
+  model: yup.string().required().strict(),
+  price: yup.number().required().strict(),
+});
 
 const getAllProducts = async () => {
   const response = { statusCode: 200 };
