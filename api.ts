@@ -7,7 +7,7 @@ import {
   QueryInput,
 } from "@aws-sdk/client-dynamodb";
 import { unmarshall, marshall } from "@aws-sdk/util-dynamodb";
-import { dbClient } from "../databaseSetup.js";
+import { dbClient } from "./databaseSetup";
 import uuid4 from "uuid4";
 import * as yup from "yup";
 import { APIGatewayProxyEvent, APIGatewayProxyResult } from "aws-lambda";
