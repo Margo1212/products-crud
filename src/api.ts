@@ -66,7 +66,7 @@ const getProduct = async (
 
     response.body = JSON.stringify({
       message: "Success;)",
-      data: Item ? unmarshall(Item) : {},
+      data: Item ? unmarshall(Item) : "Product doesn't exist",
     });
   } catch (e) {
     return handleError(e);
