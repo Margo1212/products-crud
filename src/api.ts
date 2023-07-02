@@ -55,7 +55,7 @@ const createProduct = async (
 const getProduct = async (
   event: APIGatewayProxyEvent
 ): Promise<APIGatewayProxyResult> => {
-  const response = { statusCode: 0, body: "" };
+  const response = { statusCode: 200, body: "" };
   try {
     const id = event.pathParameters?.id as string;
     const params = {
@@ -66,7 +66,6 @@ const getProduct = async (
     response.body = JSON.stringify({
       message: result.Item ? "Success;)" : "Failed;(",
       data: result.Item ? unmarshall(result.Item) : "Product doesn't exist",
-      statusCode: result.Item ? 200 : 400,
     });
   } catch (e) {
     return handleError(e);
