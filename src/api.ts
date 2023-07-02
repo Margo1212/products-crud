@@ -62,8 +62,8 @@ const getProduct = async (
       TableName: process.env.DYNAMODB_TABLE_NAME,
       Key: marshall({ id: id }),
     };
-    const { Item } = await dbClient.send(new GetItemCommand(params));
-    if (!Item) {
+    const result = await dbClient.send(new GetItemCommand(params));
+    if (!result || !result.Item) {
       response.body = JSON.stringify({
         statusCode: 404,
         message: "Failed;)",
@@ -72,7 +72,7 @@ const getProduct = async (
     }
     response.body = JSON.stringify({
       message: "Success;)",
-      data: Item ? unmarshall(Item) : {},
+      data: result.Item ? unmarshall(result.Item) : {},
     });
   } catch (e) {
     return handleError(e);
